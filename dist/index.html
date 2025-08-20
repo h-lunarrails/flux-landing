@@ -10,7 +10,7 @@
   <meta name="keywords" content="Cryptocurrency Payment,Blockchain Payments,Digital Currency Processing,Crypto Payment Gateway,Merchant Crypto Solutions,Flux Payments,Ethereum Payments,Bitcoin Payments,Stablecoin Transactions,Cross-border Crypto Payments,Decentralized Finance (DeFi) Payments,Web3 Payment Integration,Crypto E-commerce Solutions,Instant Crypto Settlements,Multi-cryptocurrency Support,Secure Blockchain Transactions,Crypto Payment API,Non-custodial Payment Processing,Crypto Point of Sale (POS),Smart Contract Payments">
   <meta name="creator" content="flux">
 
-  <!-- Social (OK if relative on GitHub Pages) -->
+  <!-- Social -->
   <meta property="og:title" content="Flux">
   <meta property="og:description" content="Revolutionize your business with Flux, the cutting-edge cryptocurrency payment processor.">
   <meta property="og:image" content="./logo.svg">
@@ -23,7 +23,7 @@
   <link rel="icon" href="./logo.svg">
   <link rel="apple-touch-icon" href="./logo.svg">
 
-  <!-- Styles (kept local) -->
+  <!-- Styles -->
   <link rel="stylesheet" href="./a91de00f2ca93b7f.css">
 </head>
 
@@ -146,14 +146,18 @@
             
             <div class="border-t pt-6">
               <h3 class="text-lg font-semibold mb-4">Join Our Contact List</h3>
-              <form id="contact-form" class="flex gap-2 max-w-md mx-auto">
-                <input type="email" id="email-input" 
+              <form name="contact" id="contact-form" class="flex gap-2 max-w-md mx-auto"
+                    method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/">
+                <input type="hidden" name="form-name" value="contact">
+                <p hidden><label>Don’t fill this: <input name="bot-field"></label></p>
+                <input type="email" name="email" id="email-input" 
                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm flex-1"
                        placeholder="Enter your email" required>
                 <button type="submit" 
                         class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                   Subscribe
                 </button>
+                <p class="form-status text-xs text-muted-foreground self-center"></p>
               </form>
               <p class="text-xs text-muted-foreground mt-2">
                 Stay updated with Flux developments and announcements.
@@ -178,7 +182,7 @@
     <div class="bg-background rounded-lg p-6 w-full max-w-md">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold">Contact Flux</h3>
-        <button id="close-modal" class="text-muted-foreground hover:text-foreground">
+        <button id="close-modal" class="text-muted-foreground hover:text-foreground" aria-label="Close">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -213,14 +217,18 @@
         
         <div class="border-t pt-4">
           <div class="text-sm font-medium mb-2">Or join our contact list:</div>
-          <form id="modal-contact-form" class="flex gap-2">
-            <input type="email" id="modal-email-input" 
+          <form name="contact" id="modal-contact-form" class="flex gap-2"
+                method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/">
+            <input type="hidden" name="form-name" value="contact">
+            <p hidden><label>Don’t fill this: <input name="bot-field"></label></p>
+            <input type="email" name="email" id="modal-email-input" 
                    class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm flex-1"
                    placeholder="Enter your email" required>
             <button type="submit" 
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3">
               Subscribe
             </button>
+            <p class="form-status text-xs text-muted-foreground self-center"></p>
           </form>
         </div>
       </div>
@@ -228,46 +236,42 @@
   </div>
 
   <script>
-    // Modal functionality
+    // Modal controls
     const contactBtn = document.getElementById('contact-btn');
     const modal = document.getElementById('contact-modal');
     const closeModal = document.getElementById('close-modal');
-    
-    contactBtn.addEventListener('click', () => {
-      modal.classList.remove('hidden');
-    });
-    
-    closeModal.addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-    
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-      }
-    });
-    
-    // Contact form handlers
-    const handleContactForm = (formId, emailInputId) => {
-      const form = document.getElementById(formId);
-      const emailInput = document.getElementById(emailInputId);
-      
-      form.addEventListener('submit', (e) => {
+    contactBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+    closeModal.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+
+    // Netlify AJAX submit (no redirect)
+    const encode = (data) => new URLSearchParams(data).toString();
+    document.querySelectorAll('form[data-netlify="true"]').forEach((f) => {
+      f.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = emailInput.value;
-        
-        if (email) {
-          // Here you would typically send the email to your backend
-          alert('Thank you for your interest! We\'ll be in touch soon.');
-          emailInput.value = '';
-          if (modal) modal.classList.add('hidden');
+        if (f.querySelector('input[name="bot-field"]')?.value) return;
+
+        const btn = f.querySelector('[type="submit"]');
+        const status = f.querySelector('.form-status');
+        const data = new FormData(f);
+
+        try {
+          if (btn) btn.disabled = true;
+          await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encode(Object.fromEntries(data))
+          });
+          f.reset();
+          if (status) status.textContent = 'Thanks. Submitted.';
+          if (f.id === 'modal-contact-form') modal.classList.add('hidden');
+        } catch (err) {
+          if (status) status.textContent = 'Submission failed. Try again.';
+        } finally {
+          if (btn) btn.disabled = false;
         }
       });
-    };
-    
-    // Initialize both contact forms
-    handleContactForm('contact-form', 'email-input');
-    handleContactForm('modal-contact-form', 'modal-email-input');
+    });
   </script>
 </body>
 </html>
