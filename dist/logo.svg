@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 410 410"  xmlns="http://www.w3.org/2000/svg" fill="transparent">
+<path transform="translate(0)" d="m0 0h964v964h-964z" />
+<path transform="translate(2,2)" d="m0 0h400v37l-2 1h-360v324h361l1 1v36l-1 1h-399z" fill="#212120"/>
+<path transform="translate(76,74)" d="m0 0h325l1 1v36l-1 1-288 1v178l288 1 1 1v36l-1 1h-325l-2-2v-252z" fill="#262625"/>
+<path transform="translate(149,146)" d="m0 0h252l1 2v36l-1 1h-216l1 33 215 1 1 1v36l-1 2h-252l-3-3v-106z" fill="#1B1B1A"/>
+<path transform="translate(149,146)" d="m0 0h252l1 2v36l-1 1h-216l1 33 215 1 1 1v36l-1 2h-252l-3-3v-106zm0 3v106l252 1v-35l-217-1v-36l217-1v-34z" />
+</svg>
